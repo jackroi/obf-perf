@@ -65,11 +65,8 @@ def perform_analysis(source_code_path: str,
                 f'--out={obf_file}',
                 source_code_full_path
             ])
-            print(obf_call)
 
-            for i in range(runs):
-
-                print(obf_config_filename_no_ext, i)
+            for _ in range(runs):
 
                 # TODO: obfuscate
                 obf_monitor = rm.ResourceMonitor(obf_call)

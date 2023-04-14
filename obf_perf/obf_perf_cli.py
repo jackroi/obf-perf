@@ -12,15 +12,13 @@ import argparse
 import os
 import sys
 import enum
-import shlex
 from dataclasses import asdict
 
 from prettytable import PrettyTable
+from alive_progress import alive_bar
 
 import obf_perf.obf_perf_core as opcore
-import obf_perf.resource_monitor as rm
 import obf_perf.result_container as rc
-import obf_perf.metrics as metrics
 
 
 @enum.unique
@@ -104,8 +102,11 @@ def main():
               ExitCode.OBF_CONFIGS_NOT_FOUND)
 
 
-    results = opcore.perform_analysis(args.source_code, obf_configs, args.runs,
-            lambda: print("TODO"))
+    bar_step_count = len(obf_configs) * args.runs
+    with alive_bar(bar_step_count) as bar:
+        results = opcore.perform_analysis(args.source_code,
+                                          obf_configs, args.runs,
+                                          lambda: bar())
 
     avg_res, stdev_res = results.getAverageResults()
     # print(avg_res)
