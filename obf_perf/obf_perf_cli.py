@@ -36,6 +36,7 @@ class ExitCode(enum.Enum):
 
     SOURCE_CODE_NOT_FOUND = 1
     OBF_CONFIGS_NOT_FOUND = 2
+    INVALID_CLI_PARAM = 3
 
 
 # TODO: remove
@@ -63,6 +64,13 @@ def main():
 
     # TODO: maybe verbose mode
 
+    if args.runs <= 0:
+        error(f"Error: the parameter `runs` must be >= 1",
+              ExitCode.INVALID_CLI_PARAM)
+
+    if args.warmup < 0:
+        error(f"Error: the parameter `warmup` must be >= 0",
+              ExitCode.INVALID_CLI_PARAM)
 
     # check source code file exists
     if not os.path.isfile(args.source_code):
@@ -102,10 +110,13 @@ def main():
               ExitCode.OBF_CONFIGS_NOT_FOUND)
 
 
-    bar_step_count = len(obf_configs) * args.runs
+    # TODO: count also normal (non obfuscated) execution
+    bar_step_count = len(obf_configs) * (args.warmup + args.runs)
     with alive_bar(bar_step_count) as bar:
         results = opcore.perform_analysis(args.source_code,
-                                          obf_configs, args.runs,
+                                          obf_configs,
+                                          args.runs,
+                                          args.warmup,
                                           lambda: bar())
 
     print_results(results)
@@ -230,6 +241,15 @@ def parse_args() -> argparse.Namespace:
         type=int,
         default=1,
         help="number of times the program is run, default 1"
+    )
+
+    parser.add_argument(
+        "-w",
+        "--warmup",
+        type=int,
+        default=0,
+        help="number of times the program is run before performing"
+             " the actual analysis, default 0"
     )
 
     # parse arguments
