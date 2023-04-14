@@ -31,17 +31,32 @@ class Result:
     execution_involuntary_context_switches: int
     execution_total_context_switches: int
 
+    def __getitem__(self, name):
+        return getattr(self, name)
+
+    @staticmethod
+    def fields():
+        return list(Result.__dataclass_fields__.values())
+
 
 class ResultContainer:
     def __init__(self):
+        # dict<name,dict<metric,list<value>>
         self._results = dict()
 
     # TODO: use snake_case instead of camel_case
     def addResult(self, result: Result):
         if result.name not in self._results:
-            self._results[result.name] = []
+            self._results[result.name] = dict()
 
-        self._results[result.name].append(result)
+        # extract a list containing all the key-value pairs except the first ("name")
+        result_items = list(asdict(result).items())[1:]
+        for metric, value in result_items:
+            if metric not in self._results[result.name]:
+                self._results[result.name][metric] = []
+            self._results[result.name][metric].append(value)
+
+
 
     # def getAllResults(self):
         # TODO
@@ -63,42 +78,26 @@ class ResultContainer:
 
 
     def getAverageResults(self):
-        output_avg = dict()
-        output_stdev = dict()
+        avg_results = dict()
+        std_results = dict()
 
-        for name in self._results:
-            res_list = self._results[name]
+        for obf_name, curr_results_dict in self._results.items():
+            avg_result_params = dict(name=obf_name)
+            std_result_params = dict(name=obf_name)
 
-            # list of dict
-            res_list_asdict = [asdict(res) for res in res_list]
-            # list of list (shape: metrics * runs)
-            # for each metric, there is the list of runs
-            metrics_runs = list(zip(*[d.values() for d in res_list_asdict]))
+            for metric_name, metric_result_list in curr_results_dict.items():
+                if len(metric_result_list) > 1:
+                    avg_result_params[metric_name] = \
+                            statistics.mean(metric_result_list)
+                    std_result_params[metric_name] = \
+                            statistics.stdev(metric_result_list)
+                else:
+                    avg_result_params[metric_name] = metric_result_list[0]
+                    std_result_params[metric_name] = 0.0
+            avg_results[obf_name] = Result(**avg_result_params)
+            std_results[obf_name] = Result(**std_result_params)
 
-            averages = [name] + [ statistics.mean(runs) for runs in metrics_runs[1:] ]
-            stdevs = [name] + [ statistics.stdev(runs) for runs in metrics_runs[1:] ]
-
-            avg_result_params = { key: averages[i] for i, key in enumerate(Result.__dataclass_fields__.keys())  }
-            stdev_result_params = { key: stdevs[i] for i, key in enumerate(Result.__dataclass_fields__.keys())  }
-
-            output_avg[name] = Result(**avg_result_params)
-            output_stdev[name] = Result(**stdev_result_params)
-
-        return output_avg, output_stdev
-
-
-
-
-            # TODO: trasform the list back to a Result object
-            # TODO: check if easier way of transposing a dictionary
-
-
-
-
-        # res = { name:  for name in range(3) }
-
-        # return a dict with a result obj with averages
-
+        return avg_results, std_results
 
 
     # TODO: maybe serialize/deserialize
