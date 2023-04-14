@@ -67,7 +67,7 @@ class ResourceMonitor:
 
         # get memory usage from stderr (`time` output)
         stderr_lines = self._stderr.split("\n")
-        self._max_memory = stderr_lines[-2]
+        self._max_memory = int(stderr_lines[-2])
         # reconstruct the original stderr (without `time` output)
         self._stderr = "\n".join(stderr_lines[:-2]) + "\n"
 
