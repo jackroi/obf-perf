@@ -124,9 +124,9 @@ def perform_analysis(source_code_path: str,
                     execution_minor_page_faults=prg_monitor.major_page_faults(),
                     execution_major_page_faults=prg_monitor.minor_page_faults(),
                     execution_total_page_faults=prg_monitor.page_faults(),
-                    executable_voluntary_context_switches=prg_monitor.volountary_context_switches(),
-                    executable_involuntary_context_switches=prg_monitor.involountary_context_switches(),
-                    executable_total_context_switches=prg_monitor.context_switches()
+                    execution_voluntary_context_switches=prg_monitor.volountary_context_switches(),
+                    execution_involuntary_context_switches=prg_monitor.involountary_context_switches(),
+                    execution_total_context_switches=prg_monitor.context_switches()
                 )
                 results.addResult(result)
 

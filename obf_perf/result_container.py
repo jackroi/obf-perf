@@ -27,9 +27,9 @@ class Result:
     execution_minor_page_faults: int
     execution_major_page_faults: int
     execution_total_page_faults: int
-    executable_voluntary_context_switches: int
-    executable_involuntary_context_switches: int
-    executable_total_context_switches: int
+    execution_voluntary_context_switches: int
+    execution_involuntary_context_switches: int
+    execution_total_context_switches: int
 
 
 class ResultContainer:

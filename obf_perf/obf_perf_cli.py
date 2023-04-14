@@ -108,32 +108,7 @@ def main():
                                           obf_configs, args.runs,
                                           lambda: bar())
 
-    avg_res, stdev_res = results.getAverageResults()
-    # print(avg_res)
-    # print(stdev_res)
-
-    table = PrettyTable()
-
-    table.add_column("Name", list(rc.Result.__dataclass_fields__.keys())[1:])
-
-    for name in avg_res:
-        col_values = [ value for value in asdict(avg_res[name]).values() ][1:]
-        table.add_column(name, col_values)
-
-    table.float_format = '0.4'
-    print(table)
-
-    table = PrettyTable()
-
-    table.add_column("Name", list(rc.Result.__dataclass_fields__.keys())[1:])
-
-    for name in avg_res:
-        col_values = [ value for value in asdict(stdev_res[name]).values() ][1:]
-        table.add_column(name, col_values)
-
-    table.float_format = '0.4'
-    print(table)
-
+    print_results(results)
 
     # TODO: maybe loading bar for each batch of runs
 
@@ -154,6 +129,53 @@ def main():
     # print(mon.user_time())
     # print(mon.max_memory())
 
+
+def print_results(results):
+    avg_res, stdev_res = results.getAverageResults()
+
+    # table = PrettyTable()
+
+    # table.add_column("Name", list(rc.Result.__dataclass_fields__.keys())[1:])
+
+    # for name in avg_res:
+    #     col_values = [ value for value in asdict(avg_res[name]).values() ][1:]
+    #     table.add_column(name, col_values)
+
+    # table.float_format = '0.4'
+    # print(table)
+
+    # table = PrettyTable()
+
+    # table.add_column("Name", list(rc.Result.__dataclass_fields__.keys())[1:])
+
+    # for name in avg_res:
+    #     col_values = [ value for value in asdict(stdev_res[name]).values() ][1:]
+    #     table.add_column(name, col_values)
+
+    # table.float_format = '0.4'
+    # print(table)
+
+
+
+
+    table = PrettyTable()
+
+    table.add_column("Name", list(rc.Result.__dataclass_fields__.keys())[1:])
+
+    for name in avg_res:
+        def mean_stdev_str(mean, stdev):
+            mean = float(mean)
+            stdev = float(stdev)
+            return f"{mean:10.3f} \xb1 {stdev:7.3f}"
+
+        col_values_mean = [ value for value in asdict(avg_res[name]).values() ][1:]
+        col_values_stdev = [ value for value in asdict(stdev_res[name]).values() ][1:]
+        col_values = [ mean_stdev_str(mean, stdev)
+                       for mean, stdev
+                       in zip(col_values_mean, col_values_stdev) ]
+        table.add_column(name, col_values)
+
+    print(table)
 
 
 def error(message, exit_code: ExitCode):
