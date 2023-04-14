@@ -43,6 +43,25 @@ class ResultContainer:
 
         self._results[result.name].append(result)
 
+    # def getAllResults(self):
+        # TODO
+
+    #     for name in self._results:
+    #         res_list = self._results[name]
+
+    #         # list of dict
+    #         res_list_asdict = [asdict(res) for res in res_list]
+    #         # list of list (shape: metrics * runs)
+    #         # for each metric, there is the list of runs
+    #         metrics_runs = list(zip(*[d.values() for d in res_list_asdict]))
+
+    #         avg_result_params = { key: averages[i] for i, key in enumerate(Result.__dataclass_fields__.keys())  }
+    #         stdev_result_params = { key: stdevs[i] for i, key in enumerate(Result.__dataclass_fields__.keys())  }
+
+    #         output_avg[name] = Result(**avg_result_params)
+    #         output_stdev[name] = Result(**stdev_result_params)
+
+
     def getAverageResults(self):
         output_avg = dict()
         output_stdev = dict()
