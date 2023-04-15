@@ -18,7 +18,7 @@ from prettytable import PrettyTable
 from alive_progress import alive_bar
 
 import obf_perf.obf_perf_core as opcore
-import obf_perf.result_container as rc
+import obf_perf.plots as plots
 
 
 @enum.unique
@@ -121,6 +121,21 @@ def main():
 
     print_results(results)
 
+    if args.plot:
+        # create the output directory (mkdir -p)
+        os.makedirs(args.output_dir, exist_ok=True)
+
+        exec_time_data_dict = results.metric_results("execution_wall_time")
+        plots.violin_plot(exec_time_data_dict,
+                          "Execution time by obfuscation type",
+                          os.path.join(args.output_dir, "execution_time.png"))
+
+
+        exec_time_data_dict = results.metric_results("execution_memory")
+        plots.violin_plot(exec_time_data_dict,
+                          "Execution memory by obfuscation type",
+                          os.path.join(args.output_dir, "execution_memory.png"))
+
     # TODO: maybe loading bar for each batch of runs
 
     # TODO: remove
@@ -148,8 +163,16 @@ def print_results(results):
         # TODO maybe dynamic number instead of fixed 10
         return f"{mean:10.3f} \xb1 {stdev:7.3f}"
 
+    # TODO: maybe use a user configurable config file
     METRICS_TO_PRINT = [ ("Time (s)", "execution_wall_time"),
-                         ("Memory (TODO)", "execution_memory") ]
+                         ("Memory (KB)", "execution_memory"),
+                         ("Page faults", "execution_total_page_faults"),
+                         ("Context switches", "execution_total_context_switches"),
+                         ("Obfuscation time (s)", "obfuscation_wall_time"),
+                         ("Compilation time (s)", "compile_wall_time"),
+                         ("Lines of code", "lines_of_code"),
+                         ("Source code size (B)", "source_code_size"),
+                         ("NCD", "compression_metric") ]
 
     avg_results, std_results = results.getAverageResults()
 

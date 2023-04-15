@@ -36,7 +36,7 @@ class Result:
 
     @staticmethod
     def fields():
-        return list(Result.__dataclass_fields__.values())
+        return list(Result.__dataclass_fields__.keys())
 
 
 class ResultContainer:
@@ -55,6 +55,15 @@ class ResultContainer:
             if metric not in self._results[result.name]:
                 self._results[result.name][metric] = []
             self._results[result.name][metric].append(value)
+
+    def metric_results(self, metric_name: str):
+        if metric_name not in Result.fields():
+            raise RuntimeError("TODO")
+
+        metric_results_by_obf = { obf_name: self._results[obf_name][metric_name]
+                                  for obf_name in self._results }
+
+        return metric_results_by_obf
 
 
 

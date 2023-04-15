@@ -8,6 +8,7 @@ import obf_perf.result_container as rc
 import obf_perf.metrics as metrics
 
 
+# TODO: maybe use a real no-op config
 __NORMAL_CONFIG = (str("00-normal"), [ "tigress",
                                        "--Environment=x86_64:Linux:Gcc:4.6",
                                        "--Transform=Ident" ])
