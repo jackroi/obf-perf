@@ -53,8 +53,6 @@ def perform_analysis(source_code_path: str,
         # chdir to make the a.out file go in the temp directory
         os.chdir(tmp_dir_name)
 
-        # TODO: before running obfuscated versions, need to run non obfuscated one
-
         for obf_config in obf_configs:
             # get the filename without the path
             obf_config_filename = os.path.basename(obf_config[0])
@@ -64,17 +62,23 @@ def perform_analysis(source_code_path: str,
             # TODO: decide if reobfuscate when repeating the benchmark
             # for simplicity no, for better average maybe yes
 
+            # generate new source code file with tigress headers
+            # same filename, but stored in the temp directory
+            new_source_code_path = source_code_filename
+            __create_tigress_source_code(source_code_full_path,
+                                         new_source_code_path,
+                                         obf_config)
 
             # output obfuscated source code filename
             obf_file = f"{source_code_filename_no_ext}-{obf_config_filename_no_ext}.c"
 
             for _ in range(warmup):
-                __obfuscate_compile_run(source_code_full_path, obf_file, obf_config)
+                __obfuscate_compile_run(new_source_code_path, obf_file, obf_config)
                 if step_callback: step_callback()
 
             for _ in range(runs):
                 try:
-                    obf_monitor, gcc_monitor, prg_monitor = __obfuscate_compile_run(source_code_full_path, obf_file, obf_config)
+                    obf_monitor, gcc_monitor, prg_monitor = __obfuscate_compile_run(new_source_code_path, obf_file, obf_config)
 
                     obf_wall_time = max(0, obf_monitor.wall_time() - gcc_monitor.wall_time())
                     obf_user_time = max(0, obf_monitor.user_time() - gcc_monitor.user_time())
@@ -161,3 +165,54 @@ def __obfuscate_compile_run(source_code_full_path, obf_file, obf_config):
         raise
 
     return obf_monitor, gcc_monitor, prg_monitor
+
+
+# create a new source code file, that includes in the original source code file
+# the required tigress header files, depending on the obfuscation configuration
+def __create_tigress_source_code(source_code_path: str,
+                                 new_source_code_path: str,
+                                 obf_config: Tuple[str, List[str]]):
+    headers = __get_tigress_headers(obf_config)
+    header_lines = [ f'#include "{header}"' for header in headers ]
+
+    # create a new source code file, that includes the required tigress headers
+    with open(source_code_path, 'r') as src, \
+         open(new_source_code_path, 'w') as dst:
+        dst.writelines(header_lines)
+        dst.write(src.read())
+
+
+# get header files required by the obfuscation configuration
+def __get_tigress_headers(obf_config: Tuple[str, List[str]]) -> List[str]:
+    # get tigress installation path
+    tigress_path = os.environ.get("TIGRESS_HOME")
+    if not tigress_path:
+        raise RuntimeError("Error: TIGRESS_HOME not set")
+
+    TIGRESS_DEFAULT_HEADERS = [ "tigress.h" ]
+    OTHER_DEFAULT_HEADERS = [ "pthread.h" ]
+    JITTER_HEADER = "jitter-amd64.c"
+    # table that maps tigress transformations to header files
+    TRANSFORMATION_TO_HEADERS = {
+        "jit": [ JITTER_HEADER ]
+    }
+
+    # identify the required header files
+    tigress_header_files = []
+    for arg in obf_config[1]:
+        if arg.startswith("--Transform="):
+            transformation = arg.split("=")[1].lower()
+            if transformation in TRANSFORMATION_TO_HEADERS:
+                tigress_header_files.extend(TRANSFORMATION_TO_HEADERS[transformation])
+
+    # add default headers
+    tigress_header_files.extend(TIGRESS_DEFAULT_HEADERS)
+
+    # prepend tigress path to tigress header files
+    header_files = [ os.path.join(tigress_path, header)
+                     for header in tigress_header_files ]
+
+    # add other default headers
+    header_files.extend(OTHER_DEFAULT_HEADERS)
+
+    return header_files
