@@ -126,35 +126,16 @@ def main():
         os.makedirs(args.output_dir, exist_ok=True)
 
         exec_time_data_dict = results.metric_results("execution_wall_time")
-        plots.violin_plot(exec_time_data_dict,
-                          "Execution time by obfuscation type",
-                          os.path.join(args.output_dir, "execution_time.png"))
-
+        plots.violin_plot_with_avg(exec_time_data_dict,
+                                   "Execution time by obfuscation type",
+                                   os.path.join(args.output_dir, "execution_time.png"))
 
         exec_time_data_dict = results.metric_results("execution_memory")
-        plots.violin_plot(exec_time_data_dict,
+        plots.violin_plot_with_avg(exec_time_data_dict,
                           "Execution memory by obfuscation type",
                           os.path.join(args.output_dir, "execution_memory.png"))
 
     # TODO: maybe loading bar for each batch of runs
-
-    # TODO: remove
-    # c = ["sleep", "1"]
-    # mon = rm.ResourceMonitor(c)
-    # status = mon.run()
-    # print(status)
-    # print(mon.wall_time())
-    # print(mon.user_time())
-    # print(mon.max_memory())
-
-    # c = ["true"]
-    # mon = rm.ResourceMonitor(c)
-    # status = mon.run()
-    # print(status)
-    # print(mon.wall_time())
-    # print(mon.user_time())
-    # print(mon.max_memory())
-
 
 def print_results(results):
     def mean_stdev_str(mean, stdev):
