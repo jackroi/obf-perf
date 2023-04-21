@@ -2,9 +2,6 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "/home/giacomo/software/tigress/3.1/tigress.h"
-#include <pthread.h>
-
 #define SIZE 10000
 
 
