@@ -78,11 +78,11 @@ def perform_analysis(source_code_path: str,
 
             for _ in range(runs):
                 try:
-                    obf_monitor, gcc_monitor, prg_monitor = __obfuscate_compile_run(new_source_code_path, obf_file, obf_config)
+                    obf_monitor, gcc1_monitor, gcc2_monitor, prg_monitor = __obfuscate_compile_run(new_source_code_path, obf_file, obf_config)
 
-                    obf_wall_time = max(0, obf_monitor.wall_time() - gcc_monitor.wall_time())
-                    obf_user_time = max(0, obf_monitor.user_time() - gcc_monitor.user_time())
-                    obf_system_time = max(0, obf_monitor.system_time() - gcc_monitor.system_time())
+                    obf_wall_time = max(0, obf_monitor.wall_time() - gcc1_monitor.wall_time())
+                    obf_user_time = max(0, obf_monitor.user_time() - gcc1_monitor.user_time())
+                    obf_system_time = max(0, obf_monitor.system_time() - gcc1_monitor.system_time())
 
                     # TODO: handle errors
                     obf_code_size = metrics.file_size(obf_file)
@@ -97,9 +97,9 @@ def perform_analysis(source_code_path: str,
                         obfuscation_user_time=obf_user_time,
                         obfuscation_system_time=obf_system_time,
                         obfuscation_memory=obf_monitor.max_memory(),
-                        compile_wall_time=gcc_monitor.wall_time(),
-                        compile_user_time=gcc_monitor.user_time(),
-                        compile_system_time=gcc_monitor.system_time(),
+                        compile_wall_time=gcc2_monitor.wall_time(),
+                        compile_user_time=gcc2_monitor.user_time(),
+                        compile_system_time=gcc2_monitor.system_time(),
                         source_code_size=obf_code_size,
                         executable_size=bin_size,
                         lines_of_code=line_count,
@@ -146,10 +146,18 @@ def __obfuscate_compile_run(source_code_full_path, obf_file, obf_config):
         print("TODO: some error happened running tigress")
         raise
 
-    # compile obfuscated code
-    gcc_call = ["gcc", "-O3", obf_file]
-    gcc_monitor = rm.ResourceMonitor(gcc_call)
-    gcc_monitor.run()
+    # compile obfuscated code (without optimizations)
+    gcc1_call = ["gcc", obf_file]
+    gcc1_monitor = rm.ResourceMonitor(gcc1_call)
+    gcc1_monitor.run()
+    if exit_status != 0:
+        print("TODO: some error happened running gcc")
+        raise
+
+    # compile obfuscated code (with optimizations)
+    gcc2_call = ["gcc", "-O3", obf_file]
+    gcc2_monitor = rm.ResourceMonitor(gcc2_call)
+    gcc2_monitor.run()
     if exit_status != 0:
         print("TODO: some error happened running gcc")
         raise
@@ -164,7 +172,7 @@ def __obfuscate_compile_run(source_code_full_path, obf_file, obf_config):
         print("TODO: some error happened running the program")
         raise
 
-    return obf_monitor, gcc_monitor, prg_monitor
+    return obf_monitor, gcc1_monitor, gcc2_monitor, prg_monitor
 
 
 # create a new source code file, that includes in the original source code file
