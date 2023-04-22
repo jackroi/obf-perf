@@ -112,7 +112,7 @@ def main():
 
     # TODO: count also normal (non obfuscated) execution
     bar_step_count = len(obf_configs) * (args.warmup + args.runs)
-    with alive_bar(bar_step_count) as bar:
+    with alive_bar(bar_step_count, file=sys.stderr) as bar:
         results = opcore.perform_analysis(args.source_code,
                                           obf_configs,
                                           args.runs,
@@ -136,6 +136,9 @@ def main():
                           os.path.join(args.output_dir, "execution_memory.png"))
 
     # TODO: maybe loading bar for each batch of runs
+
+    # TODO: cli flag for result to json
+    #results.to_json()
 
 def print_results(results):
     def mean_stdev_str(mean, stdev):
