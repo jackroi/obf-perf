@@ -1,4 +1,5 @@
 from dataclasses import dataclass, asdict
+import json
 import statistics
 
 
@@ -108,7 +109,8 @@ class ResultContainer:
 
         return avg_results, std_results
 
+    # serialize to json
+    def to_json(self):
+        return json.dumps(self._results, indent=4)
 
-    # TODO: maybe serialize/deserialize
-
-
+    # TODO: maybe deserialize

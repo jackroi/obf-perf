@@ -119,7 +119,15 @@ def main():
                                           args.warmup,
                                           lambda: bar())
 
-    print_results(results)
+    # print results using the specified format
+    if args.format == "table":
+        print_results_table(results)
+    elif args.format == "json":
+        print(results.to_json())
+    else:
+        # should not happen thanks to argparse
+        error(f"Error: invalid output format '{args.format}'",
+              ExitCode.INVALID_CLI_PARAM)
 
     if args.plot:
         # create the output directory (mkdir -p)
@@ -140,7 +148,7 @@ def main():
     # TODO: cli flag for result to json
     #results.to_json()
 
-def print_results(results):
+def print_results_table(results):
     def mean_stdev_str(mean, stdev):
         mean = float(mean)
         stdev = float(stdev)
@@ -176,6 +184,10 @@ def print_results(results):
         table.add_column(obf_name, column)
 
     print(table)
+
+
+def print_results_json(results):
+    print(results.to_json())
 
 
 def error(message, exit_code: ExitCode):
@@ -214,6 +226,15 @@ def parse_args() -> argparse.Namespace:
         "--output-dir",
         default=".",
         help="output directory, default current working directory"
+    )
+
+    # add a format argument to specify the output format (table, json)
+    parser.add_argument(
+        "-f",
+        "--format",
+        default="table",
+        choices=["table", "json"],
+        help="output format, default table"
     )
 
     parser.add_argument(
