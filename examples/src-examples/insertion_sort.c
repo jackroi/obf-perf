@@ -2,11 +2,12 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define SIZE 10000
+#define SIZE 100000
 
 
-void insertion_sort(int arr[], int len);
+void sort(int arr[], int len);
 void print_array(int array[], int size);
+void init_random_array(int array[], int size);
 
 
 int main() {
@@ -14,19 +15,22 @@ int main() {
 
   srand(time(NULL));   // Initialization, should only be called once.
 
-
-  for (int i = 0; i < SIZE; ++i) {
-    int r = rand();      // Returns a pseudo-random integer between 0 and RAND_MAX.
-    array[i] = r % 10000;
-  }
+  init_random_array(array, SIZE);
 
   print_array(array, SIZE);
 
-  insertion_sort(array, SIZE);
+  sort(array, SIZE);
 
   print_array(array, SIZE);
 
   return 0;
+}
+
+void init_random_array(int array[], int size) {
+  for (int i = 0; i < size; ++i) {
+    int r = rand();      // Returns a pseudo-random integer between 0 and RAND_MAX.
+    array[i] = r % 10000;
+  }
 }
 
 void print_array(int array[], int size) {
@@ -37,14 +41,13 @@ void print_array(int array[], int size) {
   printf("]\n");
 }
 
-
 /**
  * insertion_sort
  * - in place
  * - stable
  * - O(n^2)
  */
-void insertion_sort(int arr[], int len) {
+void sort(int arr[], int len) {
   int i, j;
   int key;
 
