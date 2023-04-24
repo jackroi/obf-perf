@@ -3,7 +3,6 @@ tigress \
   --Transform=InitEntropy \
   --Transform=InitOpaque \
     --Functions=main \
-    --InitOpaqueCount=2 \
     --InitOpaqueStructs=list,array,input,env \
   --Transform=AntiAliasAnalysis \
     --Functions=sort
