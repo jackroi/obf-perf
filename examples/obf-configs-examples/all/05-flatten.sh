@@ -1,7 +1,7 @@
 tigress \
   --Environment=x86_64:Linux:Gcc:4.6 \
   --Transform=Flatten \
-    --Functions=* \
+    --Functions=sort \
     --FlattenDispatch=switch \
     --FlattenObfuscateNext=false \
     --FlattenRandomizeBlocks=true \

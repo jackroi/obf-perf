@@ -14,4 +14,3 @@ tigress \
     --SelfModifyOperators=\* \
     --SelfModifyKinds=\* \
     --SelfModifyBogusInstructions=0
-

@@ -14,4 +14,4 @@ tigress \
       --Functions=* \
       --AddOpaqueKinds=question \
       --AddOpaqueSplitKinds=inside \
-      --AddOpaqueCount=3 \
+      --AddOpaqueCount=3
