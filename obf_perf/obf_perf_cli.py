@@ -12,6 +12,7 @@ import argparse
 import os
 import sys
 import enum
+import itertools
 from dataclasses import asdict
 
 from prettytable import PrettyTable
@@ -122,6 +123,8 @@ def main():
     # print results using the specified format
     if args.format == "table":
         print_results_table(results)
+    elif args.format == "table2":
+        print_results_table(results, transposed=True)
     elif args.format == "json":
         print(results.to_json())
     else:
@@ -148,7 +151,7 @@ def main():
     # TODO: cli flag for result to json
     #results.to_json()
 
-def print_results_table(results):
+def print_results_table(results, transposed=False):
     def mean_stdev_str(mean, stdev):
         mean = float(mean)
         stdev = float(stdev)
@@ -183,7 +186,70 @@ def print_results_table(results):
                    for _, field_name in METRICS_TO_PRINT ]
         table.add_column(obf_name, column)
 
-    print(table)
+    table = transpose_table(table) if transposed else table
+
+    print_table(table)
+
+
+# print the table split in subtables to fit the terminal width
+def print_table(table):
+    # get terminal width
+    terminal_width = os.get_terminal_size().columns
+    # get table string
+    table_str = table.get_string()
+    # get table width
+    table_width = len(table_str.splitlines()[0])
+    # get the length of the "name" column
+    name_column_width = len(table.get_string(fields=["Name"]).splitlines()[0])
+
+    # repeat until the table fits in the terminal
+    # and in the meanwhile print the subtables
+    while table_width > terminal_width:
+        # get the length of each column
+        column_widths = [ len(table.get_string(fields=[column_name]).splitlines()[0])
+                          for column_name in table.field_names[1:] ]
+        # get the cumulative length of the columns
+        cumulative_column_widths = list(itertools.accumulate(column_widths, initial=name_column_width))
+        # get the index of the first column that exceeds the terminal width
+        first_column_to_hide = next((i
+                                     for i, cum_width in enumerate(cumulative_column_widths)
+                                     if cum_width > terminal_width),
+                                    len(column_widths))
+        # names of the columns to show
+        columns_to_show = list(table.field_names[1:first_column_to_hide])
+        # print columns
+        print(table.get_string(fields=["Name"] + columns_to_show))
+        # remove columns
+        for column_name in columns_to_show:
+            table.del_column(column_name)
+        # update table width
+        table_width = len(table.get_string().splitlines()[0])
+
+    # print the remaining columns
+    print(table.get_string())
+
+
+# transpose the PrettyTable table
+def transpose_table(table: PrettyTable):
+    # new table
+    new_table = PrettyTable()
+    fields = table.get_string(fields=["Name"], border=False).splitlines()
+    # strip withespace from the fields
+    fields = [ field.strip() for field in fields ]
+
+    new_table.field_names = fields
+
+    # get the column names
+    column_names = table.field_names[1:]
+
+    # add each column as a row
+    for column_name in column_names:
+        lines = table.get_string(fields=[column_name], border=False).splitlines()
+        # strip "withespace" from the lines
+        lines = [ line[1:len(line)-1] for line in lines ]
+        new_table.add_row(lines)
+
+    return new_table
 
 
 def print_results_json(results):
@@ -228,12 +294,12 @@ def parse_args() -> argparse.Namespace:
         help="output directory, default current working directory"
     )
 
-    # add a format argument to specify the output format (table, json)
+    # add a format argument to specify the output format (table, table2, json)
     parser.add_argument(
         "-f",
         "--format",
         default="table",
-        choices=["table", "json"],
+        choices=["table", "table2", "json"],
         help="output format, default table"
     )
 
