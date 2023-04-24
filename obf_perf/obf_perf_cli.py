@@ -193,6 +193,11 @@ def print_results_table(results, transposed=False):
 
 # print the table split in subtables to fit the terminal width
 def print_table(table):
+    # directly print the table if we are not in a terminal
+    if not sys.stdout.isatty():
+        print(table)
+        return
+
     # get terminal width
     terminal_width = os.get_terminal_size().columns
     # get table string
