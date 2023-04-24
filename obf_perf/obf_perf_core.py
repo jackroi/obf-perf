@@ -1,4 +1,5 @@
 import os
+import sys
 import shlex
 import tempfile
 from typing import List, Callable, Optional, Tuple
@@ -143,7 +144,8 @@ def __obfuscate_compile_run(source_code_full_path, obf_file, obf_config):
     obf_monitor = rm.ResourceMonitor(obf_call)
     exit_status = obf_monitor.run()
     if exit_status != 0:
-        print("TODO: some error happened running tigress")
+        print("TODO: some error happened running tigress", file=sys.stderr)
+        print(obf_monitor.stderr(), file=sys.stderr)
         raise
 
     # compile obfuscated code (without optimizations)
@@ -151,7 +153,8 @@ def __obfuscate_compile_run(source_code_full_path, obf_file, obf_config):
     gcc1_monitor = rm.ResourceMonitor(gcc1_call)
     gcc1_monitor.run()
     if exit_status != 0:
-        print("TODO: some error happened running gcc")
+        print("TODO: some error happened running gcc", file=sys.stderr)
+        print(gcc1_monitor.stderr(), file=sys.stderr)
         raise
 
     # compile obfuscated code (with optimizations)
@@ -159,7 +162,8 @@ def __obfuscate_compile_run(source_code_full_path, obf_file, obf_config):
     gcc2_monitor = rm.ResourceMonitor(gcc2_call)
     gcc2_monitor.run()
     if exit_status != 0:
-        print("TODO: some error happened running gcc")
+        print("TODO: some error happened running gcc", file=sys.stderr)
+        print(gcc2_monitor.stderr(), file=sys.stderr)
         raise
 
     # TODO: subtract from tigress time, the gcc time
@@ -169,7 +173,8 @@ def __obfuscate_compile_run(source_code_full_path, obf_file, obf_config):
     prg_monitor = rm.ResourceMonitor(prg_call)
     prg_monitor.run()
     if exit_status != 0:
-        print("TODO: some error happened running the program")
+        print("TODO: some error happened running the program", file=sys.stderr)
+        print(prg_monitor.stderr(), file=sys.stderr)
         raise
 
     return obf_monitor, gcc1_monitor, gcc2_monitor, prg_monitor
@@ -181,7 +186,7 @@ def __create_tigress_source_code(source_code_path: str,
                                  new_source_code_path: str,
                                  obf_config: Tuple[str, List[str]]):
     headers = __get_tigress_headers(obf_config)
-    header_lines = [ f'#include "{header}"' for header in headers ]
+    header_lines = [ f'#include "{header}"\n' for header in headers ]
 
     # create a new source code file, that includes the required tigress headers
     with open(source_code_path, 'r') as src, \
@@ -202,7 +207,8 @@ def __get_tigress_headers(obf_config: Tuple[str, List[str]]) -> List[str]:
     JITTER_HEADER = "jitter-amd64.c"
     # table that maps tigress transformations to header files
     TRANSFORMATION_TO_HEADERS = {
-        "jit": [ JITTER_HEADER ]
+        "jit": [ JITTER_HEADER ],
+        "jitdynamic": [ JITTER_HEADER ]
     }
 
     # identify the required header files
