@@ -2,6 +2,7 @@ import os
 import sys
 import shlex
 import tempfile
+import time
 from typing import List, Callable, Optional, Tuple
 
 import obf_perf.resource_monitor as rm
@@ -73,6 +74,14 @@ def perform_analysis(source_code_path: str,
             # output obfuscated source code filename
             obf_file = f"{source_code_filename_no_ext}-{obf_config_filename_no_ext}.c"
 
+            # obfuscate source code
+            __obfuscate(new_source_code_path, obf_file, obf_config)
+
+            # compute metrics
+            ncd = metrics.normalized_compression_distance(source_code_full_path, obf_file)
+            halstead_difficulty = metrics.halstead_difficulty(source_code_full_path,
+                                                              obf_file)
+
             for _ in range(warmup):
                 __obfuscate_compile_run(new_source_code_path, obf_file, obf_config)
                 if step_callback: step_callback()
@@ -89,7 +98,6 @@ def perform_analysis(source_code_path: str,
                     obf_code_size = metrics.file_size(obf_file)
                     bin_size = metrics.file_size("a.out")
                     line_count = metrics.line_count(obf_file)
-                    ncd = metrics.normalized_compression_distance(source_code_full_path, obf_file)
 
                     # TODO: evenutually pass a dict: **args
                     result = rc.Result(
@@ -105,6 +113,7 @@ def perform_analysis(source_code_path: str,
                         executable_size=bin_size,
                         lines_of_code=line_count,
                         compression_metric=ncd,
+                        halstead_difficulty=halstead_difficulty,
                         execution_wall_time=prg_monitor.wall_time(),
                         execution_user_time=prg_monitor.user_time(),
                         execution_system_time=prg_monitor.system_time(),
@@ -132,10 +141,8 @@ def perform_analysis(source_code_path: str,
 
     return results
 
-
-def __obfuscate_compile_run(source_code_full_path, obf_file, obf_config):
-    # TODO probably split in 3 functions
-
+# obfuscate source code
+def __obfuscate(source_code_full_path, obf_file, obf_config):
     obf_call = list(obf_config[1])
     obf_call.extend([
         f'--out={obf_file}',
@@ -148,10 +155,19 @@ def __obfuscate_compile_run(source_code_full_path, obf_file, obf_config):
         print(obf_monitor.stderr(), file=sys.stderr)
         raise
 
+    return obf_monitor
+
+
+def __obfuscate_compile_run(source_code_full_path, obf_file, obf_config):
+    # TODO probably split in 3 functions
+
+    # obfuscate source code
+    obf_monitor = __obfuscate(source_code_full_path, obf_file, obf_config)
+
     # compile obfuscated code (without optimizations)
     gcc1_call = ["gcc", obf_file]
     gcc1_monitor = rm.ResourceMonitor(gcc1_call)
-    gcc1_monitor.run()
+    exit_status = gcc1_monitor.run()
     if exit_status != 0:
         print("TODO: some error happened running gcc", file=sys.stderr)
         print(gcc1_monitor.stderr(), file=sys.stderr)
@@ -160,7 +176,7 @@ def __obfuscate_compile_run(source_code_full_path, obf_file, obf_config):
     # compile obfuscated code (with optimizations)
     gcc2_call = ["gcc", "-O3", obf_file]
     gcc2_monitor = rm.ResourceMonitor(gcc2_call)
-    gcc2_monitor.run()
+    exit_status = gcc2_monitor.run()
     if exit_status != 0:
         print("TODO: some error happened running gcc", file=sys.stderr)
         print(gcc2_monitor.stderr(), file=sys.stderr)
@@ -171,7 +187,7 @@ def __obfuscate_compile_run(source_code_full_path, obf_file, obf_config):
     # run obfuscated program
     prg_call = ["./a.out"]
     prg_monitor = rm.ResourceMonitor(prg_call)
-    prg_monitor.run()
+    exit_status = prg_monitor.run()
     if exit_status != 0:
         print("TODO: some error happened running the program", file=sys.stderr)
         print(prg_monitor.stderr(), file=sys.stderr)

@@ -21,6 +21,7 @@ class Result:
     executable_size: int
     lines_of_code: int
     compression_metric: float
+    halstead_difficulty: float
     execution_wall_time: float
     execution_user_time: float
     execution_system_time: float

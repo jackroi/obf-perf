@@ -167,7 +167,8 @@ def print_results_table(results, transposed=False):
                          ("Compilation time (s)", "compile_wall_time"),
                          ("Lines of code", "lines_of_code"),
                          ("Source code size (B)", "source_code_size"),
-                         ("NCD", "compression_metric") ]
+                         ("Norm compression dist", "compression_metric"),
+                         ("Halstead difficulty", "halstead_difficulty") ]
 
     avg_results, std_results = results.getAverageResults()
 
