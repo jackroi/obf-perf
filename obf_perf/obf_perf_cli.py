@@ -136,15 +136,59 @@ def main():
         # create the output directory (mkdir -p)
         os.makedirs(args.output_dir, exist_ok=True)
 
-        exec_time_data_dict = results.metric_results("execution_wall_time")
-        plots.violin_plot_with_avg(exec_time_data_dict,
-                                   "Execution time by obfuscation type",
-                                   os.path.join(args.output_dir, "execution_time.png"))
+#         # violin plot: execution time
+#         exec_time_data_dict = results.metric_results("execution_wall_time")
+#         plots.violin_plot_with_avg(exec_time_data_dict,
+#                                    "Execution time by obfuscation type",
+#                                    os.path.join(args.output_dir, "execution_time.png"))
 
-        exec_time_data_dict = results.metric_results("execution_memory")
-        plots.violin_plot_with_avg(exec_time_data_dict,
-                          "Execution memory by obfuscation type",
-                          os.path.join(args.output_dir, "execution_memory.png"))
+#         # violin plot: execution memory
+#         exec_memory_data_dict = results.metric_results("execution_memory")
+#         plots.violin_plot_with_avg(exec_memory_data_dict,
+#                           "Execution memory by obfuscation type",
+#                           os.path.join(args.output_dir, "execution_memory.png"))
+
+#         # violin plot: obfuscation time
+#         obf_time_data_dict = results.metric_results("obfuscation_wall_time")
+#         plots.violin_plot_with_avg(obf_time_data_dict,
+#                           "Execution time by obfuscation type",
+#                           os.path.join(args.output_dir, "obfuscation_time.png"))
+
+        # list of (metric_name, metric_key) to plot using a violin plot
+        violin_plot_metrics = [ ("Execution time", "execution_wall_time"),
+                                ("Execution memory", "execution_memory"),
+                                ("Obfuscation time", "obfuscation_wall_time"),
+                                ("Compilation time", "compile_wall_time") ]
+
+        for metric_name, metric_key in violin_plot_metrics:
+            data_dict = results.metric_results(metric_key)
+            plots.violin_plot_with_avg(data_dict,
+                                       f"{metric_name} by obfuscation type",
+                                       os.path.join(args.output_dir, f"{metric_key}.png"))
+
+
+        # grouped bar plot: execution wall time, execution user time, execution system time
+        exec_wall_time_data_dict = results.metric_results("execution_wall_time")
+        exec_user_time_data_dict = results.metric_results("execution_user_time")
+        exec_system_time_data_dict = results.metric_results("execution_system_time")
+
+        # build data dict
+        data_dict_by_group = dict()
+        for obf_type in exec_wall_time_data_dict:
+            inner_dict = {
+                "Wall time": exec_wall_time_data_dict[obf_type],
+                "User time": exec_user_time_data_dict[obf_type],
+                "System time": exec_system_time_data_dict[obf_type]
+            }
+
+            data_dict_by_group[obf_type] = inner_dict
+
+        plots.grouped_bar_plot(data_dict_by_group,
+                               "Execution time by obfuscation type",
+                               os.path.join(args.output_dir, "execution_time.png"))
+
+        # TODO: probably plot page faults
+
 
     # TODO: maybe loading bar for each batch of runs
 
