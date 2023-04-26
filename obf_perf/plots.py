@@ -62,7 +62,7 @@ def grouped_bar_plot(data_dict_by_group: Dict[str,Dict[str, List[float]]], title
                        values,
                        width=width,
                        label=label)
-        ax.bar_label(rects, padding=3)
+        ax.bar_label(rects, fmt="{:.3f}", padding=3)
         multiplier += 1
 
     ax.set_title(title)
