@@ -11,3 +11,17 @@
  (so can target just that with obfuscation)
 
 - Maybe a flag to use the gcc -O3 optimization
+
+- Catch Keyboard interrupt (CTRL-C)
+
+- Comments
+- Readme
+- Some prepared example output
+- Typings
+
+
+Dependencies
+- requirements.txt
+- tigress
+- ctags
+- time
