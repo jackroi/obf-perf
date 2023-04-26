@@ -38,7 +38,7 @@ def violin_plot_with_avg(data_dict: Dict[str, List[float]], title: str, out_file
     plt.savefig(out_filename)
 
 # generate a grouped bar plot with the average of the data
-def grouped_bar_plot(data_dict_by_group: Dict[str,Dict[str, List[float]]], title: str, out_filename: str):
+def grouped_bar_plot(data_dict_by_group: Dict[str,Dict[str, List[float]]], title: str, y_label: str, out_filename: str):
     # TODO: format better the numbers over the bars (round them)
     groups = list(data_dict_by_group.keys())
     labels = list(data_dict_by_group[groups[0]].keys())
@@ -66,7 +66,7 @@ def grouped_bar_plot(data_dict_by_group: Dict[str,Dict[str, List[float]]], title
         multiplier += 1
 
     ax.set_title(title)
-    ax.set_ylabel("Average time (s)")
+    ax.set_ylabel(y_label)
     ax.set_xticks([ x + width for x in xs ], groups, rotation=45)
     ax.legend()
 

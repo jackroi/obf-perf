@@ -136,24 +136,6 @@ def main():
         # create the output directory (mkdir -p)
         os.makedirs(args.output_dir, exist_ok=True)
 
-#         # violin plot: execution time
-#         exec_time_data_dict = results.metric_results("execution_wall_time")
-#         plots.violin_plot_with_avg(exec_time_data_dict,
-#                                    "Execution time by obfuscation type",
-#                                    os.path.join(args.output_dir, "execution_time.png"))
-
-#         # violin plot: execution memory
-#         exec_memory_data_dict = results.metric_results("execution_memory")
-#         plots.violin_plot_with_avg(exec_memory_data_dict,
-#                           "Execution memory by obfuscation type",
-#                           os.path.join(args.output_dir, "execution_memory.png"))
-
-#         # violin plot: obfuscation time
-#         obf_time_data_dict = results.metric_results("obfuscation_wall_time")
-#         plots.violin_plot_with_avg(obf_time_data_dict,
-#                           "Execution time by obfuscation type",
-#                           os.path.join(args.output_dir, "obfuscation_time.png"))
-
         # list of (metric_name, metric_key) to plot using a violin plot
         violin_plot_metrics = [ ("Execution time", "execution_wall_time"),
                                 ("Execution memory", "execution_memory"),
@@ -185,15 +167,28 @@ def main():
 
         plots.grouped_bar_plot(data_dict_by_group,
                                "Execution time by obfuscation type",
+                               "Average time (s)",
                                os.path.join(args.output_dir, "execution_time.png"))
 
-        # TODO: probably plot page faults
+        # grouped bar plot: execution memory, execution page faults
+        exec_memory_data_dict = results.metric_results("execution_memory")
+        exec_page_faults_data_dict = results.metric_results("execution_total_page_faults")
 
+        # build data dict
+        data_dict_by_group = dict()
+        for obf_type in exec_wall_time_data_dict:
+            inner_dict = {
+                "Memory": exec_memory_data_dict[obf_type],
+                "Page faults": exec_page_faults_data_dict[obf_type]
+            }
 
-    # TODO: maybe loading bar for each batch of runs
+            data_dict_by_group[obf_type] = inner_dict
 
-    # TODO: cli flag for result to json
-    #results.to_json()
+        plots.grouped_bar_plot(data_dict_by_group,
+                               "Execution memory and page faults by obfuscation type",
+                               "Average memory (KB) or page faults",
+                               os.path.join(args.output_dir, "execution_memory_and_page_faults.png"))
+
 
 def print_results_table(results, transposed=False):
     def mean_stdev_str(mean, stdev):
