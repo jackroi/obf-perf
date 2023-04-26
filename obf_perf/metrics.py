@@ -42,7 +42,7 @@ def file_size(path: str) -> int:
     return os.path.getsize(path)
 
 
-def line_count(path):
+def line_count(path: str) -> int:
     """Returns the number of lines of the file at the given path.
 
     Args:
@@ -62,7 +62,7 @@ def line_count(path):
     return num_lines
 
 
-def normalized_compression_distance(orig_path: str, obf_path: str):
+def normalized_compression_distance(orig_path: str, obf_path: str) -> float:
     """Returns the normalized compression distance between
     the two files at the given paths.
 
@@ -106,7 +106,7 @@ def normalized_compression_distance(orig_path: str, obf_path: str):
     return ncd
 
 
-def halstead_difficulty(orig_path: str, obf_path: str):
+def halstead_difficulty(orig_path: str, obf_path: str) -> float:
     """Returns the Halstead difficulty metric of the obfuscated file.
 
     The Halstead difficulty metric is computed as the sum of the
