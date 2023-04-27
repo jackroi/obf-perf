@@ -107,14 +107,6 @@ class ResourceMonitor:
         self._stdout = stdout_data.decode("utf-8")
         self._stderr = stderr_data.decode("utf-8")
 
-
-        # TODO remove time output from stderr
-        # TODO understand what to do if time gives an error
-        # probably check status code + regex stderr and then clean stderr,
-        # and maybe raise an error, or something like that
-
-        # exit_code = p.returncode
-
         # regex for `time` error detection
         ERROR_REGEX = \
                 r'(\/usr\/bin\/time: cannot run).+(No such file or directory)'
