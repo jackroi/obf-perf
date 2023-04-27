@@ -1,3 +1,33 @@
+"""Module that defines the Result and ResultContainer classes.
+
+The Result class represents the result of a single run of the benchmark.
+The ResultContainer class is a container for the results of the benchmark.
+
+Typical usage example:
+    import result_container as rc
+
+    # create a ResultContainer
+    container = rc.ResultContainer()
+
+    # create a Result
+    result = rc.Result(
+        name="obfuscation_technique_name",
+        obfuscation_wall_time=1.0,
+        ...
+    )
+
+    # add the Result to the container
+    container.add_result(result)
+
+    # get the results of a metric for each obfuscation technique
+    metric_results_by_obf = container.metric_results("metric_name")
+
+    # get the average and standard deviation of the results of all metrics
+    # for each obfuscation technique
+    metric_avg_by_obf, metric_std_by_obf = container.get_average_results()
+"""
+
+
 import json
 import statistics
 from dataclasses import dataclass, asdict
