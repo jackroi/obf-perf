@@ -112,7 +112,7 @@ def perform_analysis(source_code_path: str,
                         source_code_size=obf_code_size,
                         executable_size=bin_size,
                         lines_of_code=line_count,
-                        compression_metric=ncd,
+                        norm_compression_distance=ncd,
                         halstead_difficulty=halstead_difficulty,
                         execution_wall_time=prg_monitor.wall_time(),
                         execution_user_time=prg_monitor.user_time(),
@@ -125,7 +125,7 @@ def perform_analysis(source_code_path: str,
                         execution_involuntary_context_switches=prg_monitor.involountary_context_switches(),
                         execution_total_context_switches=prg_monitor.context_switches()
                     )
-                    results.addResult(result)
+                    results.add_result(result)
 
                 except RuntimeError:
                     # TODO: catch correct error

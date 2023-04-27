@@ -13,6 +13,7 @@
 - Maybe a flag to use the gcc -O3 optimization
 
 - Catch Keyboard interrupt (CTRL-C)
+- snake_case
 
 - Comments
 - Readme
