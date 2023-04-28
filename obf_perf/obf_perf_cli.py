@@ -118,6 +118,7 @@ def main():
                                           obf_configs,
                                           args.runs,
                                           args.warmup,
+                                          args.optimization_level,
                                           lambda: bar())
 
     # print results using the specified format
@@ -133,6 +134,8 @@ def main():
               ExitCode.INVALID_CLI_PARAM)
 
     if args.plot:
+        # TODO: extract in a function
+
         # create the output directory (mkdir -p)
         os.makedirs(args.output_dir, exist_ok=True)
 
@@ -189,6 +192,25 @@ def main():
                                "Average memory (KB) or page faults",
                                os.path.join(args.output_dir, "execution_memory_and_page_faults.png"))
 
+        # grouped bar plot: source code size, executable size
+        source_code_size_data_dict = results.metric_results("source_code_size")
+        executable_size_data_dict = results.metric_results("executable_size")
+
+        # build data dict
+        data_dict_by_group = dict()
+        for obf_type in exec_wall_time_data_dict:
+            inner_dict = {
+                "Source code size (B)": source_code_size_data_dict[obf_type],
+                "Executable size (B)": executable_size_data_dict[obf_type]
+            }
+
+            data_dict_by_group[obf_type] = inner_dict
+
+        plots.grouped_bar_plot(data_dict_by_group,
+                               "Source code size and executable size by obfuscation type",
+                               "Average size (B)",
+                               os.path.join(args.output_dir, "source_code_size_and_executable_size.png"))
+
 
 def print_results_table(results, transposed=False):
     def mean_stdev_str(mean, stdev):
@@ -206,6 +228,7 @@ def print_results_table(results, transposed=False):
                          ("Compilation time (s)", "compile_wall_time"),
                          ("Lines of code", "lines_of_code"),
                          ("Source code size (B)", "source_code_size"),
+                         ("Executable size (B)", "executable_size"),
                          ("Norm compression dist", "norm_compression_distance"),
                          ("Halstead difficulty", "halstead_difficulty") ]
 
@@ -371,6 +394,16 @@ def parse_args() -> argparse.Namespace:
         default=0,
         help="number of times the program is run before performing"
              " the actual analysis, default 0"
+    )
+
+    parser.add_argument(
+        "-O",
+        "--optimization-level",
+        type=int,
+        default=3,
+        choices=[ 0, 1, 2, 3 ],
+        help="compiler optimization level, 0: no optimization,"
+             " 3: maximum optimization, default 3"
     )
 
     # parse arguments
