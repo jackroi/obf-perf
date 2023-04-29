@@ -1,5 +1,25 @@
+"""Core module of the obf-perf tool.
+
+This module contains the core functions of the obf-perf tool.
+The main function is `perform_analysis`, which performs the analysis on the
+given source code file, using the given obfuscation configs.
+
+Typical usage example:
+    import obf_perf_core as opc
+
+    # load the obfuscation configs
+    obf_configs = opc.load_obfuscation_configs(["config1.txt", "config2.txt"])
+
+    # perform the analysis
+    results = opc.perform_analysis("source_code.c",
+                                   obf_configs,
+                                   runs=10,
+                                   warmup=3,
+                                   optimization_level=3)
+"""
+
+
 import os
-import sys
 import shlex
 import tempfile
 from typing import List, Tuple, Optional, Callable
@@ -87,6 +107,7 @@ def perform_analysis(source_code_path: str,
 
     Raises:
         OSError: If the source code file cannot be read.
+        CalledProcessError: If a command fails.
     """
 
     # validate arguments
@@ -123,7 +144,8 @@ def perform_analysis(source_code_path: str,
             # get the obfuscation config filename without the path
             obf_config_filename = os.path.basename(obf_config[0])
             # get the obfuscation config filename without the extension
-            obf_config_filename_no_ext = os.path.splitext(obf_config_filename)[0]
+            obf_config_filename_no_ext = \
+                os.path.splitext(obf_config_filename)[0]
 
             # dynamically generate new source code file with the required
             # tigress headers, depending on the obfuscation config
@@ -153,71 +175,75 @@ def perform_analysis(source_code_path: str,
             # perform the warmup runs
             for _ in range(warmup):
                 # run the analysis, but do not save the results
-                __obfuscate_compile_run(new_source_code_path, obf_file, obf_config, optimization_level)
+                __obfuscate_compile_run(new_source_code_path,
+                                        obf_file,
+                                        obf_config,
+                                        optimization_level)
                 # call the callback function
                 if step_callback: step_callback()
 
             # perform the actual runs
             for _ in range(runs):
-                try:
-                    # run the analysis
-                    obf_monitor, gcc1_monitor, gcc2_monitor, prg_monitor = \
-                        __obfuscate_compile_run(new_source_code_path,
-                                                obf_file,
-                                                obf_config,
-                                                optimization_level)
+                # run the analysis
+                obf_monitor, gcc1_monitor, gcc2_monitor, prg_monitor = \
+                    __obfuscate_compile_run(new_source_code_path,
+                                            obf_file,
+                                            obf_config,
+                                            optimization_level)
 
-                    # compute tigress obfuscation process related metrics;
-                    # need to subtract the gcc1 times, because they are
-                    # included in the obfuscation times, since the tigress
-                    # obfuscation process concludes with a call to gcc;
-                    # to avoid negative values, we take the max with 0
-                    obf_wall_time = max(0, obf_monitor.wall_time()
-                                           - gcc1_monitor.wall_time())
-                    obf_user_time = max(0, obf_monitor.user_time()
-                                           - gcc1_monitor.user_time())
-                    obf_system_time = max(0, obf_monitor.system_time()
-                                             - gcc1_monitor.system_time())
+                # compute tigress obfuscation process related metrics;
+                # need to subtract the gcc1 times, because they are
+                # included in the obfuscation times, since the tigress
+                # obfuscation process concludes with a call to gcc;
+                # to avoid negative values, we take the max with 0
+                obf_wall_time = max(0, obf_monitor.wall_time()
+                                       - gcc1_monitor.wall_time())
+                obf_user_time = max(0, obf_monitor.user_time()
+                                       - gcc1_monitor.user_time())
+                obf_system_time = max(0, obf_monitor.system_time()
+                                         - gcc1_monitor.system_time())
 
-                    obf_code_size = metrics.file_size(obf_file)
-                    bin_size = metrics.file_size("a.out")
-                    line_count = metrics.line_count(obf_file)
+                # compute some metrics
+                obf_code_size = metrics.file_size(obf_file)
+                bin_size = metrics.file_size("a.out")
+                line_count = metrics.line_count(obf_file)
 
-                    result = rc.Result(
-                        name=obf_config_filename_no_ext,
-                        obfuscation_wall_time=obf_wall_time,
-                        obfuscation_user_time=obf_user_time,
-                        obfuscation_system_time=obf_system_time,
-                        obfuscation_memory=obf_monitor.max_memory(),
-                        compile_wall_time=gcc2_monitor.wall_time(),
-                        compile_user_time=gcc2_monitor.user_time(),
-                        compile_system_time=gcc2_monitor.system_time(),
-                        source_code_size=obf_code_size,
-                        executable_size=bin_size,
-                        lines_of_code=line_count,
-                        norm_compression_distance=ncd,
-                        halstead_difficulty=halstead_difficulty,
-                        execution_wall_time=prg_monitor.wall_time(),
-                        execution_user_time=prg_monitor.user_time(),
-                        execution_system_time=prg_monitor.system_time(),
-                        execution_memory=prg_monitor.max_memory(),
-                        execution_minor_page_faults=prg_monitor.major_page_faults(),
-                        execution_major_page_faults=prg_monitor.minor_page_faults(),
-                        execution_total_page_faults=prg_monitor.page_faults(),
-                        execution_voluntary_context_switches=prg_monitor.volountary_context_switches(),
-                        execution_involuntary_context_switches=prg_monitor.involountary_context_switches(),
-                        execution_total_context_switches=prg_monitor.context_switches()
-                    )
-                    results.add_result(result)
+                # build the result by extracting the relevant data
+                result = rc.Result(
+                    name=obf_config_filename_no_ext,
+                    obfuscation_wall_time=obf_wall_time,
+                    obfuscation_user_time=obf_user_time,
+                    obfuscation_system_time=obf_system_time,
+                    obfuscation_memory=obf_monitor.max_memory(),
+                    compile_wall_time=gcc2_monitor.wall_time(),
+                    compile_user_time=gcc2_monitor.user_time(),
+                    compile_system_time=gcc2_monitor.system_time(),
+                    source_code_size=obf_code_size,
+                    executable_size=bin_size,
+                    lines_of_code=line_count,
+                    norm_compression_distance=ncd,
+                    halstead_difficulty=halstead_difficulty,
+                    execution_wall_time=prg_monitor.wall_time(),
+                    execution_user_time=prg_monitor.user_time(),
+                    execution_system_time=prg_monitor.system_time(),
+                    execution_memory=prg_monitor.max_memory(),
+                    execution_minor_page_faults=
+                        prg_monitor.major_page_faults(),
+                    execution_major_page_faults=
+                        prg_monitor.minor_page_faults(),
+                    execution_total_page_faults=prg_monitor.page_faults(),
+                    execution_voluntary_context_switches=
+                        prg_monitor.volountary_context_switches(),
+                    execution_involuntary_context_switches=
+                        prg_monitor.involountary_context_switches(),
+                    execution_total_context_switches=
+                        prg_monitor.context_switches()
+                )
+                # add the result to the ResultContainer
+                results.add_result(result)
 
-                except RuntimeError:
-                    # TODO: catch correct error
-                    # TODO something happened
-                    pass
-
-                finally:
-                    if step_callback: step_callback()
-
+                # call the callback function
+                if step_callback: step_callback() # type: ignore
 
         # chdir to initial cwd
         os.chdir(old_cwd)
@@ -225,42 +251,78 @@ def perform_analysis(source_code_path: str,
     return results
 
 
-# obfuscate source code
-def __obfuscate(source_code_full_path, obf_file_name, obf_config):
+def __obfuscate(source_code_path: str,
+                obf_file_name: str,
+                obf_config: Tuple[str, List[str]]) -> rm.ResourceMonitor:
+    """Obfuscate the source code using the given obfuscation config.
+
+    Args:
+        source_code_path: Path to the source code file.
+        obf_file_name: Name of the (output) obfuscated source code file.
+        obf_config: Obfuscation config.
+
+    Returns:
+        ResourceMonitor object associated with the obfuscation process.
+
+    Raises:
+        CalledProcessError: If the obfuscation process fails.
+    """
+
+    # arguments to call the obfuscator
     obf_call = list(obf_config[1])
+    # add output and input files to the arguments
     obf_call.extend([
         f'--out={obf_file_name}',
-        source_code_full_path
+        source_code_path
     ])
+    # run the obfuscator
     obf_monitor = rm.ResourceMonitor(obf_call)
-    exit_status = obf_monitor.run()
-    if exit_status != 0:
-        print("TODO: some error happened running tigress", file=sys.stderr)
-        print(obf_monitor.stderr(), file=sys.stderr)
-        raise
-
+    obf_monitor.run()
     return obf_monitor
 
 
-# compile obfuscated code
-def __compile(obf_file_name: str, optimization_level: int):
+def __compile(obf_file_name: str,
+              optimization_level: int) -> rm.ResourceMonitor:
+    """Compile the obfuscated source code.
+
+    Args:
+        obf_file_name: Name of the obfuscated source code file.
+        optimization_level: Optimization level for the compiler.
+            Takes values from 0 to 3, where 0 is no optimization and
+            3 is the highest optimization.
+
+    Returns:
+        ResourceMonitor object associated with the compilation process.
+
+    Raises:
+        CalledProcessError: If the compilation process fails.
+    """
+
     # validate optimization level
     if optimization_level < 0 or optimization_level > 3:
         raise ValueError("`optimization_level` must be between 0 and 3")
 
-    gcc_call = ["gcc", f"-O{optimization_level}", obf_file_name]
+    # arguments to call the compiler
+    gcc_call = [ "gcc", f"-O{optimization_level}", obf_file_name ]
+    # run the compiler
     gcc_monitor = rm.ResourceMonitor(gcc_call)
-    exit_status = gcc_monitor.run()
-    if exit_status != 0:
-        print("TODO: some error happened running gcc", file=sys.stderr)
-        print(gcc_monitor.stderr(), file=sys.stderr)
-        raise
-
+    gcc_monitor.run()
     return gcc_monitor
 
 
-# run obfuscated code
-def __run(executable_name: str = "a.out"):
+def __run(executable_name: str = "a.out") -> rm.ResourceMonitor:
+    """Run the executable.
+
+    Args:
+        executable_name: Name of the executable file.
+
+    Returns:
+        ResourceMonitor object associated with the execution process.
+
+    Raises:
+        CalledProcessError: If the execution process fails.
+    """
+
     # validate executable name
     if not executable_name:
         raise ValueError("`executable_name` cannot be empty")
@@ -268,31 +330,55 @@ def __run(executable_name: str = "a.out"):
     # executable name that works even if it's not in PATH
     executable_name = os.path.join("./", executable_name)
 
+    # arguments to call the executable
     run_call = [ executable_name ]
     run_monitor = rm.ResourceMonitor(run_call)
-    exit_status = run_monitor.run()
-    if exit_status != 0:
-        print("TODO: some error happened running a.out", file=sys.stderr)
-        print(run_monitor.stderr(), file=sys.stderr)
-        raise
-
+    run_monitor.run()
     return run_monitor
 
 
+def __obfuscate_compile_run(source_code_path: str,
+                            obf_file: str,
+                            obf_config: Tuple[str, List[str]],
+                            optimization_level: int
+                            ) -> Tuple[rm.ResourceMonitor,
+                                       rm.ResourceMonitor,
+                                       rm.ResourceMonitor,
+                                       rm.ResourceMonitor]:
+    """Obfuscate, compile and run the source code.
 
-def __obfuscate_compile_run(source_code_full_path, obf_file, obf_config, optimization_level):
-    # TODO probably split in 3 functions
+    Args:
+        source_code_path: Path to the source code file.
+        obf_file: Name of the (output) obfuscated source code file.
+        obf_config: Obfuscation config.
+        optimization_level: Optimization level for the compiler.
+            Takes values from 0 to 3, where 0 is no optimization and
+            3 is the highest optimization.
+
+    Returns:
+        Tuple of four ResourceMonitor objects associated with the obfuscation,
+        compilation (without optimization), compilation (with optimization),
+        and execution processes.
+        If `optimization_level` is 0, the third and fourth elements of the
+        tuple are the same.
+
+    Raises:
+        CalledProcessError: If any of the processes fails.
+    """
 
     # obfuscate source code
-    obf_monitor = __obfuscate(source_code_full_path, obf_file, obf_config)
+    obf_monitor = __obfuscate(source_code_path, obf_file, obf_config)
 
     # compile obfuscated code (without optimizations)
     gcc1_monitor = __compile(obf_file, optimization_level=0)
 
     # compile obfuscated code (with optimizations) if required
     if optimization_level > 0:
-        gcc2_monitor = __compile(obf_file, optimization_level=optimization_level)
+        gcc2_monitor = __compile(obf_file,
+                                 optimization_level=optimization_level)
     else:
+        # if no optimizations are required, use the same monitor
+        # as for the compilation without optimizations
         gcc2_monitor = gcc1_monitor
 
     # run obfuscated program
@@ -301,30 +387,61 @@ def __obfuscate_compile_run(source_code_full_path, obf_file, obf_config, optimiz
     return obf_monitor, gcc1_monitor, gcc2_monitor, prg_monitor
 
 
-# create a new source code file, that includes in the original source code file
-# the required tigress header files, depending on the obfuscation configuration
 def __create_tigress_source_code(source_code_path: str,
                                  new_source_code_path: str,
-                                 obf_config: Tuple[str, List[str]]):
+                                 obf_config: Tuple[str, List[str]]) -> None:
+    """Creates a new source code file, with the required tigress headers.
+
+    Creates a new source code file, that includes in the original
+    source code file the required tigress header files, depending on the
+    obfuscation configuration.
+
+    Args:
+        source_code_path: Path to the source code file.
+        new_source_code_path: Path to the new source code file.
+        obf_config: Obfuscation config.
+
+    Raises:
+        OSError: If the source code file cannot be opened.
+    """
+
+    # get tigress header files required by the obfuscation configuration
     headers = __get_tigress_headers(obf_config)
+    # generate the include lines
     header_lines = [ f'#include "{header}"\n' for header in headers ]
 
     # create a new source code file, that includes the required tigress headers
     with open(source_code_path, 'r') as src, \
          open(new_source_code_path, 'w') as dst:
+        # write the include lines
         dst.writelines(header_lines)
+        # write the original source code
         dst.write(src.read())
 
 
 # get header files required by the obfuscation configuration
 def __get_tigress_headers(obf_config: Tuple[str, List[str]]) -> List[str]:
+    """Gets the header files required by the obfuscation configuration.
+
+    Args:
+        obf_config: Obfuscation config.
+
+    Returns:
+        List of header files required by the obfuscation configuration.
+    """
+
     # get tigress installation path
     tigress_path = os.environ.get("TIGRESS_HOME")
     if not tigress_path:
+        # tigress not installed properly
         raise RuntimeError("Error: TIGRESS_HOME not set")
 
+    # default header files required by tigress for all obfuscations
     TIGRESS_DEFAULT_HEADERS = [ "tigress.h" ]
+    # default header files required by tigress for all obfuscations
+    # but not included by tigress
     OTHER_DEFAULT_HEADERS = [ "pthread.h" ]
+    # header file required by tigress for jitter obfuscation
     JITTER_HEADER = "jitter-amd64.c"
     # table that maps tigress transformations to header files
     TRANSFORMATION_TO_HEADERS = {
@@ -334,11 +451,17 @@ def __get_tigress_headers(obf_config: Tuple[str, List[str]]) -> List[str]:
 
     # identify the required header files
     tigress_header_files = []
+    # go through the arguments of the obfuscation configuration
     for arg in obf_config[1]:
+        # if the argument is a transformation
         if arg.startswith("--Transform="):
+            # get the transformation name (lowercase)
             transformation = arg.split("=")[1].lower()
+            # if the transformation requires header files
             if transformation in TRANSFORMATION_TO_HEADERS:
-                tigress_header_files.extend(TRANSFORMATION_TO_HEADERS[transformation])
+                # add the required header files
+                tigress_header_files.\
+                    extend(TRANSFORMATION_TO_HEADERS[transformation])
 
     # add default headers
     tigress_header_files.extend(TIGRESS_DEFAULT_HEADERS)
