@@ -24,7 +24,6 @@ Typical usage example:
 
 
 import os
-import re
 import time
 import subprocess
 from typing import List
@@ -45,8 +44,14 @@ class ResourceMonitor:
     # - _stdout (str): the stdout of the process
     # - _stderr (str): the stderr of the process
 
-    def __init__(self, args: List[str]):
-        """Initialize the resource monitor."""
+    def __init__(self, args: List[str], check: bool = True):
+        """Initialize the resource monitor.
+
+        Args:
+            args: The command to run.
+            check: Whether to raise an error if the command exits with
+                a non-zero exit status code.
+        """
 
         # validate args
         if len(args) == 0:
@@ -54,6 +59,7 @@ class ResourceMonitor:
 
         # copy args
         self._args = args.copy()
+        self._check = check
         # set as not run
         self._run = False
 
@@ -65,6 +71,10 @@ class ResourceMonitor:
 
         Returns:
             The exit status code of the process.
+
+        Raises:
+            CalledProcessError: If the process exits with a non-zero
+                exit status code and `check` is `True`.
         """
 
         # extended args for precise memory usage monitoring
@@ -97,6 +107,13 @@ class ResourceMonitor:
         # stop timer for wall clock time
         end = time.perf_counter()
 
+        # check exit status code and raise error if necessary
+        if self._check and status != 0:
+            raise subprocess.CalledProcessError(status,
+                                                args,
+                                                stdout_data,
+                                                stderr_data)
+
         # store wall clock time
         self._wall_time = end - start
 
@@ -106,16 +123,6 @@ class ResourceMonitor:
         # decode and store stdout and stderr
         self._stdout = stdout_data.decode("utf-8")
         self._stderr = stderr_data.decode("utf-8")
-
-        # regex for `time` error detection
-        ERROR_REGEX = \
-                r'(\/usr\/bin\/time: cannot run).+(No such file or directory)'
-
-        # if `time` gives an error, clean stderr and raise an error
-        if status == 127 and re.match(ERROR_REGEX, self._stderr):
-            self._stderr = ""
-            raise RuntimeError(
-                    f"Error: no such executable file '{self._args[0]}'")
 
         # get memory usage from stderr (`time` output)
         stderr_lines = self._stderr.splitlines()

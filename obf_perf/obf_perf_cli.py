@@ -114,6 +114,7 @@ def main():
     # TODO: count also normal (non obfuscated) execution
     bar_step_count = len(obf_configs) * (args.warmup + args.runs)
     with alive_bar(bar_step_count, file=sys.stderr) as bar:
+        # TODO: catch exceptions and print them
         results = opcore.perform_analysis(args.source_code,
                                           obf_configs,
                                           args.runs,
