@@ -155,6 +155,16 @@ class ResultContainer:
         self._results: Dict[str, Dict[str, List[Union[int, float]]]] = dict()
 
 
+    def obfuscation_types(self) -> List[str]:
+        """Returns the names of the obfuscation techniques.
+
+        Returns:
+            The list of names of the obfuscation techniques.
+        """
+
+        return list(self._results.keys())
+
+
     def add_result(self, result: Result) -> None:
         """Adds a Result to the container.
 

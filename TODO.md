@@ -14,6 +14,8 @@
 
 - Catch Keyboard interrupt (CTRL-C)
 - snake_case
+- Maybe logging ???
+- Try on macos ???
 
 - Comments
 - Readme
