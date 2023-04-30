@@ -119,8 +119,8 @@ def main():
 
 
 def validate_args(args: argparse.Namespace) -> List[str]:
-    """Validate the command line arguments and extract the obfuscation config
-    paths.
+    """Validates the command line arguments and extracts the
+    obfuscation config paths.
 
     Args:
         args: The command line arguments.

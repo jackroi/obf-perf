@@ -109,7 +109,7 @@ class Result:
 
 
     def __getitem__(self, name: str):
-        """Access the fields of the Result using the [] operator.
+        """Accesses the fields of the Result using the [] operator.
 
         Args:
             name: Name of the field to be accessed.
@@ -267,7 +267,7 @@ class ResultContainer:
         return avg_results, std_results
 
 
-    def to_json(self):
+    def to_json(self) -> str:
         """Serializes the ResultContainer to JSON."""
 
         return json.dumps(self._results, indent=4)

@@ -43,7 +43,7 @@ def violin_plot(data_dict: Dict[str, List[float]],
                 y_label: str,
                 out_filename: Optional[str] = None
                 ) -> Tuple[plt.Figure, plt.Axes]:
-    """Generate a violin plot with the given data.
+    """Generates a violin plot with the given data.
 
     Args:
         data_dict: Dictionary mapping labels to lists of data.
@@ -86,7 +86,7 @@ def violin_plot_with_avg(data_dict: Dict[str, List[float]],
                          y_label: str,
                          out_filename: Optional[str] = None
                          ) -> Tuple[plt.Figure, plt.Axes]:
-    """Generate a violin plot with the given data and a red line that
+    """Generates a violin plot with the given data and a red line that
     passes through the averages of the various data.
 
     Args:
@@ -124,7 +124,7 @@ def grouped_bar_plot(data_dict_by_group: Dict[str,Dict[str, List[float]]],
                      y_label: str,
                      out_filename: Optional[str] = None
                      ) -> Tuple[plt.Figure, plt.Axes]:
-    """Generate a grouped bar plot with the given data.
+    """Generates a grouped bar plot with the given data.
 
     Args:
         data_dict_by_group: Dictionary mapping groups to dictionaries

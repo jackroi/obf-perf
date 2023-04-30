@@ -254,7 +254,7 @@ def perform_analysis(source_code_path: str,
 def __obfuscate(source_code_path: str,
                 obf_file_name: str,
                 obf_config: Tuple[str, List[str]]) -> rm.ResourceMonitor:
-    """Obfuscate the source code using the given obfuscation config.
+    """Obfuscates the source code using the given obfuscation config.
 
     Args:
         source_code_path: Path to the source code file.
@@ -283,7 +283,7 @@ def __obfuscate(source_code_path: str,
 
 def __compile(obf_file_name: str,
               optimization_level: int) -> rm.ResourceMonitor:
-    """Compile the obfuscated source code.
+    """Compiles the obfuscated source code.
 
     Args:
         obf_file_name: Name of the obfuscated source code file.
@@ -311,7 +311,7 @@ def __compile(obf_file_name: str,
 
 
 def __run(executable_name: str = "a.out") -> rm.ResourceMonitor:
-    """Run the executable.
+    """Runs the executable.
 
     Args:
         executable_name: Name of the executable file.
@@ -345,7 +345,7 @@ def __obfuscate_compile_run(source_code_path: str,
                                        rm.ResourceMonitor,
                                        rm.ResourceMonitor,
                                        rm.ResourceMonitor]:
-    """Obfuscate, compile and run the source code.
+    """Obfuscates, compiles and runs the source code.
 
     Args:
         source_code_path: Path to the source code file.

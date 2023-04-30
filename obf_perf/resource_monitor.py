@@ -30,7 +30,7 @@ from typing import List
 
 
 class ResourceMonitor:
-    """Run a process and monitor its resource usage."""
+    """Runs a process and monitors its resource usage."""
 
     # attributes:
     # - _args (List[str]): the command to run
@@ -45,7 +45,7 @@ class ResourceMonitor:
     # - _stderr (str): the stderr of the process
 
     def __init__(self, args: List[str], check: bool = True):
-        """Initialize the resource monitor.
+        """Initializes the resource monitor.
 
         Args:
             args: The command to run.
@@ -65,7 +65,7 @@ class ResourceMonitor:
 
 
     def run(self) -> int:
-        """Run the process and monitor its resource usage.
+        """Runs the process and monitors its resource usage.
 
         Requires that `/usr/bin/time` is installed.
 
@@ -137,7 +137,7 @@ class ResourceMonitor:
 
 
     def stdout(self) -> str:
-        """Get the stdout of the process.
+        """Gets the stdout of the process.
 
         Returns:
             The stdout of the process.
@@ -151,7 +151,7 @@ class ResourceMonitor:
 
 
     def stderr(self) -> str:
-        """Get the stderr of the process.
+        """Gets the stderr of the process.
 
         Returns:
             The stderr of the process.
@@ -165,7 +165,7 @@ class ResourceMonitor:
 
 
     def wall_time(self) -> float:
-        """Get the wall clock time of the process.
+        """Gets the wall clock time of the process.
 
         Returns:
             The wall clock time of the process.
@@ -179,7 +179,7 @@ class ResourceMonitor:
 
 
     def user_time(self) -> float:
-        """Get the user time of the process.
+        """Gets the user time of the process.
 
         Returns:
             The user time of the process.
@@ -193,7 +193,7 @@ class ResourceMonitor:
 
 
     def system_time(self) -> float:
-        """Get the system time of the process.
+        """Gets the system time of the process.
 
         Returns:
             The system time of the process.
@@ -207,7 +207,7 @@ class ResourceMonitor:
 
 
     def max_memory(self) -> int:
-        """Get the maximum memory usage of the process.
+        """Gets the maximum memory usage of the process.
 
         Returns:
             The maximum memory usage of the process.
@@ -221,7 +221,7 @@ class ResourceMonitor:
 
 
     def minor_page_faults(self) -> int:
-        """Get the number of minor page faults of the process.
+        """Gets the number of minor page faults of the process.
 
         Returns:
             The number of minor page faults of the process.
@@ -235,7 +235,7 @@ class ResourceMonitor:
 
 
     def major_page_faults(self) -> int:
-        """Get the number of major page faults of the process.
+        """Gets the number of major page faults of the process.
 
         Returns:
             The number of major page faults of the process.
@@ -249,7 +249,7 @@ class ResourceMonitor:
 
 
     def page_faults(self) -> int:
-        """Get the number of page faults of the process.
+        """Gets the number of page faults of the process.
 
         Returns:
             The number of page faults of the process.
@@ -263,7 +263,7 @@ class ResourceMonitor:
 
 
     def swaps(self) -> int:
-        """Get the number of swaps of the process.
+        """Gets the number of swaps of the process.
 
         Returns:
             The number of swaps of the process.
@@ -277,7 +277,7 @@ class ResourceMonitor:
 
 
     def volountary_context_switches(self) -> int:
-        """Get the number of volountary context switches of the process.
+        """Gets the number of volountary context switches of the process.
 
         Returns:
             The number of volountary context switches of the process.
@@ -291,7 +291,7 @@ class ResourceMonitor:
 
 
     def involountary_context_switches(self) -> int:
-        """Get the number of involountary context switches of the process.
+        """Gets the number of involountary context switches of the process.
 
         Returns:
             The number of involountary context switches of the process.
@@ -305,7 +305,7 @@ class ResourceMonitor:
 
 
     def context_switches(self) -> int:
-        """Get the number of context switches of the process.
+        """Gets the number of context switches of the process.
 
         Returns:
             The number of context switches of the process.
@@ -320,7 +320,7 @@ class ResourceMonitor:
 
 
     def _ensure_run(self) -> None:
-        """Ensure that the process has been run.
+        """Ensures that the process has been run.
 
         Raises:
             RuntimeError: If the process has not been run.
