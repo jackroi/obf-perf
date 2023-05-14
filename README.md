@@ -26,9 +26,9 @@
 
 ## 🧐 About <a name = "about"></a>
 
-The `obf-perf` project is a tool designed to compare different obfuscation
-methods for software programs. The purpose of this project is to evaluate
-and analyze the performance of various obfuscation techniques.
+The `obf-perf` tool is designed to compare different obfuscation
+methods for software programs. In particular it aims to evaluate
+and analyze the performance of the various obfuscation techniques.
 
 With `obf-perf`, the original program is compared with several other
 obfuscated versions of it, and a range of metrics are gathered, such as
@@ -40,8 +40,8 @@ insights into the effectiveness of different obfuscation techniques,
 allowing them to make informed decisions on how best to protect their
 code from malicious attacks.
 
-This project was developed for the "Software Security" course of the Computer Science
-master degree programme of Ca' Foscari University of Venice.
+This project was developed for the "Software Security" course of the
+Computer Science master degree programme of Ca' Foscari University of Venice.
 
 ## 🏁 Getting Started <a name = "getting_started"></a>
 
@@ -85,9 +85,15 @@ python3 obf_perf.py -h
 
 
 ## 🎈 Usage <a name="usage"></a>
-The obf-perf tool is designed to compare the effectiveness of different obfuscation methods for a given C source code. The tool takes as input the source code to obfuscate, as well as a list of obfuscation configurations or a folder containing them. It provides several optional arguments such as the output directory, output format, number of runs, number of warmups, and optimization level.
+The `obf-perf` tool is designed to compare the effectiveness of different
+obfuscation methods for a given C source code.
+The tool takes as input the source code to obfuscate, as well as
+a list of obfuscation configurations or a folder containing them.
+It provides several optional arguments such as the output directory,
+output format, number of runs, number of warmups, and optimization level.
 
-For example, to compare three different obfuscation configurations for a C program named "myprogram.c", you could run the following command:
+For example, to compare three different obfuscation configurations
+for a C program named "myprogram.c", you could run the following command:
 
 ```bash
 obf-perf.py myprogram.c obf_config1.txt obf_config2.txt obf_config3.txt
@@ -118,6 +124,8 @@ obf-perf.py myprogram.c obf_config1.txt obf_config2.txt obf_config3.txt -w 10
 ```
 
 It is important to note that increasing the number of runs and warmups can significantly increase the total runtime of the tool. Therefore, it is recommended to use these options judiciously and consider the trade-off between accuracy and runtime.
+
+TODO: add section explaining how to write obfuscation configurations
 
 ## ⛏️ Built Using <a name = "built_using"></a>
 - [Python](https://www.python.org/) - Programming Language
