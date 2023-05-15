@@ -105,25 +105,36 @@ To plot the results, use the `-p` option:
 obf-perf.py myprogram.c obf_config1.txt obf_config2.txt obf_config3.txt -p
 ```
 
-The tool supports different output formats, which can be specified using the `-f` option. For example, to output the results in JSON format, use:
+The tool supports different output formats, which can be specified using
+the `-f` option. For example, to output the results in JSON format, use:
 
 ```bash
 obf-perf.py myprogram.c obf_config1.txt obf_config2.txt obf_config3.txt -f json
 ```
 
-The `-r` argument specifies the number of times the program is run to gather performance metrics. By default, it is set to 1. For example, to run the program 5 times, you can use the following command:
+The `-r` argument specifies the number of times the program is run to
+gather performance metrics. By default, it is set to 1. For example,
+to run the program 5 times, you can use the following command:
 
 ```bash
 obf-perf.py myprogram.c obf_config1.txt obf_config2.txt obf_config3.txt -r 5
 ```
 
-The `-w` argument specifies the number of times the program is run before performing the actual analysis. This is useful for warming up the program and ensuring that the results are not skewed by any initial overhead. By default, it is set to 0. For example, to run the program 10 times for warming up before performing the actual analysis, you can use the following command:
+The `-w` argument specifies the number of times the program is run
+before performing the actual analysis. This is useful for warming up
+the program and ensuring that the results are not skewed by any initial
+overhead. By default, it is set to 0. For example, to run the program
+10 times for warming up before performing the actual analysis, you can
+use the following command:
 
 ```bash
 obf-perf.py myprogram.c obf_config1.txt obf_config2.txt obf_config3.txt -w 10
 ```
 
-It is important to note that increasing the number of runs and warmups can significantly increase the total runtime of the tool. Therefore, it is recommended to use these options judiciously and consider the trade-off between accuracy and runtime.
+It is important to note that increasing the number of runs and warmups
+can significantly increase the total runtime of the tool. Therefore,
+it is recommended to use these options judiciously and consider the
+trade-off between accuracy and runtime.
 
 TODO: add section explaining how to write obfuscation configurations
 
@@ -135,4 +146,6 @@ TODO: add section explaining how to write obfuscation configurations
 ## ✍️ Authors <a name = "authors"></a>
 - [@jackroi](https://github.com/jackroi) - Idea & Initial work
 
-See also the list of [contributors](https://github.com/jackroi/obf-perf/contributors) who participated in this project.
+See also the list of
+[contributors](https://github.com/jackroi/obf-perf/contributors) who
+participated in this project.
