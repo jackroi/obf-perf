@@ -27,6 +27,7 @@ import os
 import sys
 import enum
 import itertools
+import signal
 from typing import List, Union
 from matplotlib import subprocess
 
@@ -70,6 +71,9 @@ class ExitCode(enum.Enum):
 
 def main():
     """Main function of the obf-perf command line interface."""
+
+    # exit gracefully on keyboard interrupt
+    signal.signal(signal.SIGINT, interrupt_handler)
 
     # parse cli arguments using argparse
     args = parse_args()
@@ -463,6 +467,20 @@ def error(message: str, exit_code: ExitCode) -> None:
 
     print(message, file=sys.stderr)
     sys.exit(exit_code.value)
+
+
+import time
+def interrupt_handler(signum: int, frame) -> None:
+    """Handler for the SIGINT signal (CTRL-C).
+
+    Args:
+        signum: Signal number.
+        frame: Current stack frame.
+    """
+
+    # print a message and exit
+    print("CTRL-C: exiting...", file=sys.stderr)
+    sys.exit(0)
 
 
 def parse_args() -> argparse.Namespace:
