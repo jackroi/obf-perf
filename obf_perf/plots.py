@@ -195,7 +195,7 @@ def grouped_bar_plot(data_dict_by_group: Dict[str,Dict[str, List[float]]],
     # increase by 10% the top limit of the y axis to make the bar labels fit
     _, top_lim = ax.get_ylim()
     ax.set_ylim(top=top_lim + 0.1 * top_lim)
-    ax.legend()
+    ax.legend(loc="upper left")
 
     # save the plot if an output filename is provided
     if out_filename: plt.savefig(out_filename)
