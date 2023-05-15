@@ -136,7 +136,57 @@ can significantly increase the total runtime of the tool. Therefore,
 it is recommended to use these options judiciously and consider the
 trade-off between accuracy and runtime.
 
-TODO: add section explaining how to write obfuscation configurations
+### Obfuscation configuration files
+The obfuscation configurations utilized in `obf-perf` are formatted as
+Tigress obfuscator commands, specifying desired transformations and
+associated parameters. These configurations are stored in separate
+text files, each representing a specific obfuscation setup. `obf-perf`
+interprets these files and transfers the required parameters to Tigress
+for the obfuscation process.
+
+To create an obfuscation config for `obf-perf`, you can start by examining
+an existing Tigress command script or shell script that performs the
+desired obfuscation. Remove the `--out` and `source_code` parameters
+from the Tigress command, as `obf-perf` handles these internally. You
+can then take the remaining Tigress parameters and options and structure
+them in a configuration file.
+
+For example, let's say you have a Tigress command in a shell script named
+`obfuscate.sh`:
+
+```bash
+tigress \
+  --Environment=x86_64:Linux:Gcc:4.6 \
+  --Transform=Virtualize \
+    --Functions=sort \
+    --VirtualizeDispatch=direct
+    --out=obf.c
+    myprogram.c
+```
+
+To convert this into an `obf-perf` obfuscation config, you can create
+simply remove the last two lines, and you're left with a perfectly valid
+`obf-perf` configuration file:
+
+```bash
+tigress \
+  --Environment=x86_64:Linux:Gcc:4.6 \
+  --Transform=Virtualize \
+    --Functions=sort \
+    --VirtualizeDispatch=direct
+```
+
+The line breaks (and indentation) are not required for `obf-perf` and
+can be omitted, but are recommended for readability.
+Backslashes are not required as well, but are useful if you
+want to convert in a fast way configurations from and to shell scripts.
+
+For more details about the available transformations and their parameters,
+you can refer to the Tigress website or documentation. The Tigress website
+provides comprehensive information about the transformations supported
+by Tigress and their respective parameters, allowing you to explore and
+experiment with various obfuscation techniques and configurations.
+
 
 ## ⛏️ Built Using <a name = "built_using"></a>
 - [Python](https://www.python.org/) - Programming Language
