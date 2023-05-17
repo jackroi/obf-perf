@@ -38,6 +38,7 @@ from typing import Dict, List, Optional, Tuple
 import matplotlib.pyplot as plt
 
 
+# set the font size of the plots
 plt.rcParams.update({ 'font.size': 16 })
 
 
