@@ -204,8 +204,9 @@ def perform_analysis(source_code_path: str,
                                          - gcc1_monitor.system_time())
 
                 # compute some metrics
-                obf_code_size = metrics.file_size(obf_file)
-                bin_size = metrics.file_size("a.out")
+                # (bytes to kilobytes)
+                obf_code_size = metrics.file_size(obf_file) / 1000
+                bin_size = metrics.file_size("a.out") / 1000
                 line_count = metrics.line_count(obf_file)
 
                 # build the result by extracting the relevant data
