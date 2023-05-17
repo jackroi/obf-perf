@@ -38,6 +38,9 @@ from typing import Dict, List, Optional, Tuple
 import matplotlib.pyplot as plt
 
 
+plt.rcParams.update({ 'font.size': 16 })
+
+
 def violin_plot(data_dict: Dict[str, List[float]],
                 title: str,
                 y_label: str,
@@ -73,7 +76,7 @@ def violin_plot(data_dict: Dict[str, List[float]],
     # customize the plot
     ax.set_title(title)
     ax.set_ylabel(y_label)
-    ax.set_xticks(range(1, len(labels)+1), labels)
+    ax.set_xticks(range(1, len(labels)+1), labels, rotation=45)
 
     # save the plot if an output filename is provided
     if out_filename: plt.savefig(out_filename)
@@ -192,9 +195,9 @@ def grouped_bar_plot(data_dict_by_group: Dict[str,Dict[str, List[float]]],
     ax.set_xticks([ x + bar_width * (len(labels) - 1) / 2 for x in x_coords ],
                   groups,
                   rotation=45)
-    # increase by 10% the top limit of the y axis to make the bar labels fit
+    # increase by 15% the top limit of the y axis to make the bar labels fit
     _, top_lim = ax.get_ylim()
-    ax.set_ylim(top=top_lim + 0.1 * top_lim)
+    ax.set_ylim(top=top_lim + 0.15 * top_lim)
     ax.legend(loc="upper left")
 
     # save the plot if an output filename is provided
