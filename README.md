@@ -24,6 +24,8 @@
 - [Built Using](#built_using)
 - [Authors](#authors)
 
+TODO: add an example output (table, json, plots)
+
 ## 🧐 About <a name = "about"></a>
 
 The `obf-perf` tool is designed to compare different obfuscation
