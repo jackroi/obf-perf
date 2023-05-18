@@ -161,8 +161,8 @@ tigress \
   --Environment=x86_64:Linux:Gcc:4.6 \
   --Transform=Virtualize \
     --Functions=sort \
-    --VirtualizeDispatch=direct
-    --out=obf.c
+    --VirtualizeDispatch=direct \
+    --out=obf.c \
     myprogram.c
 ```
 
