@@ -62,11 +62,11 @@ class Result:
     compile_system_time: float
     """System time of the compilation process."""
 
-    source_code_size: int
-    """Size of the source code in bytes."""
+    source_code_size: float
+    """Size of the source code in kilobytes."""
 
-    executable_size: int
-    """Size of the executable in bytes."""
+    executable_size: float
+    """Size of the executable in kilobytes."""
 
     lines_of_code: int
     """Number of lines of code."""
