@@ -239,11 +239,9 @@ def print_results_table(results: rc.ResultContainer,
         # convert to float
         mean = float(mean)
         stdev = float(stdev)
-        # TODO maybe dynamic number instead of fixed 10
         # mean plus/minus stdev
         return f"{mean:10.3f} \xb1 {stdev:7.3f}"
 
-    # TODO: maybe use a user configurable config file
     # metrics to print
     # list of tuples (metric name, metric key)
     METRICS_TO_PRINT = [
