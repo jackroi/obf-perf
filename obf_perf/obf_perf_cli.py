@@ -66,9 +66,6 @@ class ExitCode(enum.Enum):
     """An error occurred while running the analysis."""
 
 
-# TODO: maybe verbose mode
-
-
 def main():
     """Main function of the obf-perf command line interface."""
 

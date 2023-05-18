@@ -1,14 +1,11 @@
 # TODO
 
-- Try on macos ???
+- Some prepared example output
+    - Folder with example output (maybe for the two examples)
 
 - Readme
-- Some prepared example output
-
-- Probably transform bytes (B) in KB
-
-- Improve readme
-- Readme 80 columns
+    - 80 columns
+    - show an example (table + plots)
 
 - Check TODOs
 
