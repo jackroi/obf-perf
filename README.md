@@ -21,10 +21,10 @@
 - [About](#about)
 - [Getting Started](#getting_started)
 - [Usage](#usage)
+- [Example](#example)
 - [Built Using](#built_using)
 - [Authors](#authors)
 
-TODO: add an example output (table, json, plots)
 
 ## 🧐 About <a name = "about"></a>
 
@@ -188,6 +188,18 @@ you can refer to the Tigress website or documentation. The Tigress website
 provides comprehensive information about the transformations supported
 by Tigress and their respective parameters, allowing you to explore and
 experiment with various obfuscation techniques and configurations.
+
+
+## Example <a name = "example"></a>
+
+![Result table](images/result_table.png)
+![Plot 1](images/execution_time.png)
+![Plot 2](images/execution_wall_time.png)
+![Plot 3](images/execution_memory_and_page_faults.png)
+![Plot 4](images/execution_memory.png)
+![Plot 5](images/source_code_size_and_executable_size.png)
+![Plot 6](images/obfuscation_wall_time.png)
+![Plot 7](images/compile_wall_time.png)
 
 
 ## ⛏️ Built Using <a name = "built_using"></a>
